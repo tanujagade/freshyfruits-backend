@@ -11,7 +11,7 @@ import footerRoutes from "./routes/footerRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cart.js";
 import orderRoutes from "./routes/orderRoutes.js";
-import paymentRoutes from "./routes/payment.js";
+// import paymentRoutes from "./routes/payment.js";
 
 dotenv.config();
 connectDB();
@@ -39,7 +39,7 @@ app.use("/api/footer", footerRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
-app.use("/api/payment", paymentRoutes);
+// app.use("/api/payment", paymentRoutes);
 
 /* TEST ROUTE */
 app.get("/", (req, res) => {
