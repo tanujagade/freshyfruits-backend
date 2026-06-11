@@ -1,161 +1,168 @@
 import express from "express";
+import mongoose from "mongoose";
 import Product from "../models/Product.js";
 
 const router = express.Router();
 
-/* ADD PRODUCT */
+/* ==========================
+   ADD PRODUCT
+========================== */
 router.post("/add", async (req, res) => {
-
   try {
-
-    const product = new Product(req.body);
-
-    await product.save();
+    const product = await Product.create(req.body);
 
     res.status(201).json({
-      message: "Product Added",
-      product
+      success: true,
+      message: "Product added successfully",
+      product,
     });
-
-  } catch (err) {
-
-    console.error(err);
+  } catch (error) {
+    console.error("Add Product Error:", error);
 
     res.status(500).json({
-      message: "Error adding product"
+      success: false,
+      message: "Failed to add product",
     });
-
   }
-
 });
 
-
-/* GET ALL PRODUCTS */
+/* ==========================
+   GET ALL PRODUCTS
+========================== */
 router.get("/", async (req, res) => {
-
   try {
-
-    const products = await Product.find().sort({ createdAt: -1 });
-
-    res.json(products);
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      message: "Error fetching products"
+    const products = await Product.find().sort({
+      createdAt: -1,
     });
 
-  }
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Get Products Error:", error);
 
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch products",
+    });
+  }
 });
 
-
-/* GET PRODUCTS BY CATEGORY */
-router.get("/category/:category", async (req, res) => {
-
+/* ==========================
+   GET PRODUCTS BY CATEGORY
+========================== */
+router.get("/category/:slug", async (req, res) => {
   try {
+    const { slug } = req.params;
 
     const products = await Product.find({
-      category: req.params.category
+      category: slug,
     });
 
-    res.json(products);
-
+    res.status(200).json(products);
   } catch (error) {
-
-    console.error(error);
+    console.error("Category Error:", error);
 
     res.status(500).json({
-      message: "Error fetching category products"
+      success: false,
+      message: "Failed to fetch category products",
     });
-
   }
-
 });
 
-
-/* GET PRODUCTS BY SEASONAL */
+/* ==========================
+   GET PRODUCTS BY SEASON
+========================== */
 router.get("/seasonal/:slug", async (req, res) => {
-
   try {
+    const { slug } = req.params;
 
     const products = await Product.find({
-      season: req.params.slug
+      season: slug,
     });
 
-    res.json(products);
-
+    res.status(200).json(products);
   } catch (error) {
-
-    console.error(error);
+    console.error("Season Error:", error);
 
     res.status(500).json({
-      message: "Error fetching seasonal products"
+      success: false,
+      message: "Failed to fetch seasonal products",
     });
-
   }
-
 });
 
-
-/* SEARCH PRODUCTS */
+/* ==========================
+   SEARCH PRODUCTS
+========================== */
 router.get("/search/:query", async (req, res) => {
-
   try {
-
     const query = req.params.query;
 
     const products = await Product.find({
       $or: [
-        { name: { $regex: query, $options: "i" } },
-        { category: { $regex: query, $options: "i" } }
-      ]
+        {
+          name: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+        {
+          category: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+        {
+          description: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+      ],
     });
 
-    res.json(products);
-
-  } catch (err) {
-
-    console.error("Search Error:", err);
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Search Error:", error);
 
     res.status(500).json({
-      message: "Error searching products"
+      success: false,
+      message: "Failed to search products",
     });
-
   }
-
 });
 
-
-/* GET SINGLE PRODUCT */
+/* ==========================
+   GET SINGLE PRODUCT
+========================== */
 router.get("/:id", async (req, res) => {
-
   try {
+    const { id } = req.params;
 
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-
-      return res.status(404).json({
-        message: "Product not found"
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID",
       });
-
     }
 
-    res.json(product);
+    const product = await Product.findById(id);
 
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json(product);
   } catch (error) {
-
-    console.error(error);
+    console.error("Single Product Error:", error);
 
     res.status(500).json({
-      message: "Error fetching product"
+      success: false,
+      message: "Failed to fetch product",
     });
-
   }
-
 });
 
 export default router;
