@@ -14,6 +14,7 @@ import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cart.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 /* CONFIG */
 dotenv.config();
@@ -51,7 +52,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/chatbot", chatRoutes);
-
+app.use("/api/contact", contactRoutes);
 /* TEST ROUTE */
 app.get("/", (req, res) => {
   res.send("FreshyFruits API Running 🍎");
